@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">AboutMe</string>
+    <string name="name">G10</string>
+    <string name="yellow_star">Yellow Star</string>
+    <string name="bio">Texto para mi biografía</string>
+    <string name="what_is_your_nickname">What is your Nickname?</string>
+    <string name="done">Done</string>
+</resources>
