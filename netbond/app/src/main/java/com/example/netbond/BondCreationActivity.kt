@@ -40,7 +40,6 @@ class BondCreationActivity : AppCompatActivity() {
 
         val editQuestion = findViewById<TextView>(R.id.edit_question)
         val editWrongAns = findViewById<TextView>(R.id.edit_wrong_ans)
-        val editRightAns = findViewById<TextView>(R.id.edit_right_ans)
 
         // imgProfile.setImageURI(user.profile_image)
         // Glide.with(this).load(user.profile_image).into(imgProfile)
@@ -48,7 +47,6 @@ class BondCreationActivity : AppCompatActivity() {
 
         btnAddWrongAns.setOnClickListener {
             wrongList.add(editWrongAns.text.toString())
-            editRightAns.text = wrongList.last()
         }
     }
 

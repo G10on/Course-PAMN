@@ -1,9 +1,12 @@
 package com.example.netbond.services
 
+import com.example.netbond.models.Bond
 import com.example.netbond.models.User
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class StorageService {
@@ -22,19 +25,26 @@ class StorageService {
 
     fun updateUser(user : User?) : Boolean {
 
-        val currentUsername = user!!.username!!
+        val username = user!!.username!!
 
         collUsers
-            .document(currentUsername)
-            .update(mapOf(
-                // Add remaining fields / Pass Custom class?
-                "name" to user!!.name,
-                "username" to user!!.username,
-                "n_followings" to user!!.n_followings!!,
-                "n_followers" to user!!.n_followers!!,
-                "n_points" to user!!.n_points!!)
-            )
-        // ¿Volver a guardar resto de campos para generalizar a nuevo usuario?
+            .whereEqualTo("username", username).get().addOnSuccessListener { result ->
+                val doc = result.single()
+                collUsers
+                    .document(doc.id)
+                    .update(
+                        mapOf(
+                            // Add remaining fields / Pass Custom class?
+                            "name" to user!!.name,
+                            "username" to user!!.username,
+                            "n_followings" to user!!.n_followings!!,
+                            "n_followers" to user!!.n_followers!!,
+                            "n_points" to user!!.n_points!!,
+                            "email" to user!!.email
+                        )
+                    )
+                // ¿Volver a guardar resto de campos para generalizar a nuevo usuario?
+            }
         return true
     }
 
@@ -90,6 +100,30 @@ class StorageService {
             .collection(coll)
             .document(extUser!!.username!!).delete()
     }
+
+    fun createBond(bond: Bond) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bondId = collBonds
+                .add(bond)
+                .await()
+                .id
+            collUsers
+                .whereEqualTo("username", bond.author).get().addOnSuccessListener { result ->
+                    val doc = result.single()
+                    collUsers
+                        .document(doc.id)
+                        .collection("bonds")
+                        .document(bondId)
+                        .set(hashMapOf("question" to bond.question))
+                }
+        }
+    }
+
+    suspend fun getBondById(bondId: String): Bond? = collBonds
+        .document(bondId)
+        .get()
+        .await()
+        .toObject(Bond::class.java)
 
 }
 

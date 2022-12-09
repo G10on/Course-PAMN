@@ -9,19 +9,18 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import com.example.netbond.controllers.BondController
-import com.example.netbond.services.StorageService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class BondCreationFragment : Fragment(R.layout.activity_bond_creation) {
 
-    private val db = StorageService()
     private val bondController = BondController()
     private val currentUsername = "johndoe"// getExternalUsername()
-    private var quest: String = ""
-    private var ansList = ArrayList<String>()
+    private var ansList = hashMapOf<String, String>()
+    private var ansId:Int = 0
     private var rightView:View? = null
+    private var rightId = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,24 +38,16 @@ class BondCreationFragment : Fragment(R.layout.activity_bond_creation) {
         super.onViewCreated(view, savedInstanceState)
 
         setFields()
-
-        val buttonClick = view.findViewById<Button>(R.id.btn_create_bond)
-        buttonClick.setOnClickListener {
-            // Action
-//            val intent = Intent(this, UserProfileActivity::class.java)
-//            startActivity(intent)
-        }
     }
 
     fun setFields() {
 
         val btnAddWrong = requireView().findViewById<Button>(R.id.btn_add_wrong_ans)
         val lvWrongAns = requireView().findViewById<ListView>(R.id.lv_wrong_ans)
-        val btnCreateBond = requireView().findViewById<ListView>(R.id.btn_create_bond)
+        val btnCreateBond = requireView().findViewById<Button>(R.id.btn_create_bond)
 
         val editQuestion = view?.findViewById<TextView>(R.id.edit_question)
         val editWrongAns = view?.findViewById<TextView>(R.id.edit_wrong_ans)
-        val editRightAns = view?.findViewById<TextView>(R.id.edit_right_ans)
 
         // imgProfile.setImageURI(user.profile_image)
         // Glide.with(this).load(user.profile_image).into(imgProfile)
@@ -68,7 +59,8 @@ class BondCreationFragment : Fragment(R.layout.activity_bond_creation) {
 //            editRightAns?.text = ansList.last()
 
             if (editWrongAns != null && !editWrongAns.text.isNullOrEmpty()) {
-                ansList.add(editWrongAns.text.toString())
+                ansList.put(ansId.toString(), editWrongAns.text.toString())
+                ansId = ansId + 1
                 editWrongAns.text = ""
                 updateAns()
             }
@@ -80,18 +72,18 @@ class BondCreationFragment : Fragment(R.layout.activity_bond_creation) {
             if (!view.equals(rightView)) {
                 view.setBackgroundColor(Color.GREEN)
                 rightView = view
+                rightId = id.toInt()
             }
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            var thisUser = db.getUser(currentUsername)
-            btnCreateBond.setOnClickListener {
-                bondController.createBond(
-                    quest,
+
+        btnCreateBond.setOnClickListener {
+                bondController.shareBond(
+                    currentUsername,
+                    editQuestion!!.text.toString(),
                     ansList,
-                    view?.id!!.toInt()
+                    rightId.toString()
                 )
-            }
         }
 
     }
@@ -102,7 +94,7 @@ class BondCreationFragment : Fragment(R.layout.activity_bond_creation) {
             this.requireContext(),
             android.R.layout.simple_list_item_1,
 //            arrayOf(ansList.values.toList())
-            ansList
+            ansList.values.toList()
         )
     }
 

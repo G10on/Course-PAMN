@@ -21,7 +21,7 @@ class ExternalUserProfileFragment : Fragment(R.layout.activity_external_user_pro
     private val db = StorageService()
     private val followController = FollowController()
     private val currentUsername = "johndoe"// getExternalUsername()
-    private val externalUsername = "ash"// getExternalUsername()
+    private val externalUsername = "aashish"// getExternalUsername()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

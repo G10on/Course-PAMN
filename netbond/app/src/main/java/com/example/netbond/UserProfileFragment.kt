@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import com.bumptech.glide.Glide
 import com.example.netbond.R
 import com.example.netbond.services.StorageService
 import kotlinx.coroutines.CoroutineScope
@@ -57,14 +58,15 @@ class UserProfileFragment : Fragment(R.layout.activity_user_profile) {
         var txtnumFollowings = view?.findViewById<TextView>(R.id.txt_num_followings)
 
         // imgProfile.setImageURI(user.profile_image)
-        // Glide.with(this).load(user.profile_image).into(imgProfile)
+
         // Picasso.get().load(user.profile_image).into(imgProfile)
 
         var thisUsername = "johndoe"// getThisUsername()
         CoroutineScope(Dispatchers.Main).launch{
             var user = db.getUser(thisUsername)
             txtUsername!!.text = thisUsername
-            if (user != null) {
+            if ((user != null) && (imgProfile != null)) {
+                Glide.with(requireView()).load(user.profile_image).into(imgProfile)
                 txtName!!.text = user.name
                 txtnumFollowings!!.text = user.n_followings.toString()
                 txtnumPoints!!.text = user.n_points.toString()
@@ -74,9 +76,4 @@ class UserProfileFragment : Fragment(R.layout.activity_user_profile) {
 
     }
 
-//    private fun getName() {
-//        // Get the decimal value from the cost of service text field
-//        val stringInTextField = binding.editxt_name.text.toString()
-//        val cost = stringInTextField.toDoubleOrNull()
-//    }
 }
